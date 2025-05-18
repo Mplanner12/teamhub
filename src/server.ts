@@ -7,7 +7,8 @@ import { setupSwagger } from "./config/swagger";
 import cors from "cors";
 import allRoutes from "./ruotes/index";
 import swaggerUi from "swagger-ui-express";
-import swaggerDoc from "../swagger.json";
+import fs from "fs";
+const swaggerDoc = JSON.parse(fs.readFileSync("swagger.json", "utf8"));
 
 const app = express();
 
