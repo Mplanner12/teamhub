@@ -1,0 +1,27 @@
+/* Custom styles for Plannorium branding */
+.swagger-ui {
+  font-family: "Arial", sans-serif; /* Change to your preferred font */
+  background-color: #f4f4f4; /* Example background color */
+}
+
+.swagger-ui .topbar {
+  background-color: #007bff; /* Example top bar color */
+}
+
+.swagger-ui .topbar .link {
+  color: #ffffff; /* Example link color */
+}
+
+.swagger-ui .footer {
+  text-align: center;
+  padding: 10px;
+  background-color: #007bff; /* Match the top bar color */
+  color: #ffffff;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
+
+.swagger-ui .footer p {
+  margin: 0;
+}
