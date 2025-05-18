@@ -12,8 +12,10 @@ const swaggerSpec = swaggerJSDoc({
         "TeamHub collaboration backend API docs powered by Plannorium",
     },
     servers: [{ url: "https://teamhub-six.vercel.app" }],
+    // servers: [{ url: "http://localhost:8000" }],
   },
-  apis: ["./src/modules/**/*.ts"],
+  // apis: ["./src/modules/**/*.ts"],
+  apis: ["./dist/modules/**/*.js"],
 });
 
 export const setupSwagger = (app: Express) => {
