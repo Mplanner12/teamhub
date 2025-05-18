@@ -2,19 +2,17 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/server.ts",
-      "use": "@vercel/node"
+      "src": "src/server.ts",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["dist/swagger.json"]
+      }
     }
   ],
-  "functions": {
-    "api/server.ts": {
-      "includeFiles": ["src/swagger.json"]
-    }
-  },
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "api/server.ts"
+      "dest": "src/server.ts"
     }
   ]
 }
