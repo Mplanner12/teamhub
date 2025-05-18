@@ -14,8 +14,8 @@ const swaggerSpec = swaggerJSDoc({
     servers: [{ url: "https://teamhub-six.vercel.app" }],
     // servers: [{ url: "http://localhost:8000" }],
   },
-  // apis: ["./src/modules/**/*.ts"],
-  apis: ["./dist/modules/**/*.js"],
+  apis: ["./src/modules/**/*.ts"],
+  // apis: ["./dist/modules/**/*.js"],
 });
 
 export const setupSwagger = (app: Express) => {
