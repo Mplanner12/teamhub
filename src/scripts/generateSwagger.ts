@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 import swaggerJSDoc from "swagger-jsdoc";
 
 const swaggerSpec = swaggerJSDoc({
@@ -14,4 +15,7 @@ const swaggerSpec = swaggerJSDoc({
   apis: ["./src/modules/**/*.ts"],
 });
 
-fs.writeFileSync("dist/swagger.json", JSON.stringify(swaggerSpec, null, 2));
+fs.writeFileSync(
+  path.join(__dirname, "../swagger.json"),
+  JSON.stringify(swaggerSpec, null, 2)
+);

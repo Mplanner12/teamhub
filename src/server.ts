@@ -10,7 +10,7 @@ import swaggerUi from "swagger-ui-express";
 import fs from "fs";
 import path from "path";
 
-const swaggerPath = path.join(__dirname, "swagger.json");
+const swaggerPath = path.join(__dirname, "../swagger.json");
 console.log("Looking for Swagger file at:", swaggerPath);
 if (!fs.existsSync(swaggerPath)) {
   console.error("Swagger file not found at runtime!");
