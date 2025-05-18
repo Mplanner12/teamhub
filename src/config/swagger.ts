@@ -88,6 +88,10 @@ export const setupSwagger = (app: Express) => {
   app.use(
     "/api-docs",
     swaggerUi.serve,
-    swaggerUi.setup(null, swaggerUiOptions) // Pass null as the first argument for spec
+    swaggerUi.setup(swaggerSpec, {
+      ...swaggerUiOptions,
+      customJs: undefined, // This disables trying to load a local JS
+    })
+    // swaggerUi.setup(null, swaggerUiOptions) // Pass null as the first argument for spec
   );
 };
