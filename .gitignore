@@ -1,0 +1,88 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# TypeScript build output
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Runtime files
+*.pid
+*.seed
+*.meta
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+# Uploads 
+uploads/
+
+# Coverage reports
+coverage/
+
+# Editor/IDE specific files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# npm package lock v1 
+package-lock.json
+
+# Yarn lock file v1
+yarn.lock
+.ts-node/
+
+# Next.js build output 
+# .next/
+
+# Vercel build output 
+# .vercel/
+
+# Render build output 
+# .render/
+
+# DigitalOcean App Platform build output 
+# .do/
+
+# Docker build context files
+!.dockerignore
+
+# Ignore all files in the root except the ones explicitly tracked
+/*
+!/.*
+!/.gitignore
+!/package.json
+!/package-lock.json # or !/yarn.lock
+!/tsconfig.json
+!/nodemon.json
+!/Dockerfile #
+!/README.md #
+!/LICENSE #
+!/src/
+!/public/ #
+!/config/ #
+
+# Re-include specific files within ignored directories
+#!/dist/.gitkeep
+#!/.vscode/settings.json
+#!/.vscode/tasks.json
+#!/.vscode/launch.json
+#!/.vscode/extensions.json
