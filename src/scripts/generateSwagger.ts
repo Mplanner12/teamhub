@@ -11,7 +11,7 @@ const swaggerSpec = swaggerJSDoc({
     },
     servers: [{ url: "https://teamhub-six.vercel.app" }],
   },
-  apis: ["./src/modules/**/*.js"],
+  apis: ["./src/modules/**/*.ts"],
 });
 
 fs.writeFileSync("dist/swagger.json", JSON.stringify(swaggerSpec, null, 2));
