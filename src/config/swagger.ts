@@ -12,7 +12,8 @@ const swaggerSpec = swaggerJSDoc({
       description:
         "TeamHub collaboration backend API docs powered by Plannorium",
     },
-    servers: [{ url: "http://localhost:8000" }],
+    // servers: [{ url: "http://localhost:8000" }],
+    servers: [{ url: "https://teamhub-six.vercel.app/" }],
   },
   apis: ["./src/modules/**/*.ts"],
 });
