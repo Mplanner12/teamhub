@@ -11,7 +11,11 @@ import fs from "fs";
 import path from "path";
 
 const swaggerPath = path.join(__dirname, "swagger.json");
-console.log("Reading Swagger file from:", swaggerPath);
+console.log("Looking for Swagger file at:", swaggerPath);
+if (!fs.existsSync(swaggerPath)) {
+  console.error("Swagger file not found at runtime!");
+  throw new Error("Missing swagger.json in deployed environment.");
+}
 const swaggerDoc = JSON.parse(fs.readFileSync(swaggerPath, "utf8"));
 
 const app = express();
