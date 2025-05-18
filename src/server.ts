@@ -1,5 +1,5 @@
 import http from "http";
-import express, { Request, Response, NextFunction } from "express"; // Added Request, Response, NextFunction
+import express, { Request, Response, NextFunction } from "express";
 import { Server } from "socket.io";
 import { socketHandler } from "./config/socket";
 import { connectDB } from "./config/db";
@@ -8,7 +8,10 @@ import cors from "cors";
 import allRoutes from "./ruotes/index";
 import swaggerUi from "swagger-ui-express";
 import fs from "fs";
-const swaggerDoc = JSON.parse(fs.readFileSync("swagger.json", "utf8"));
+import path from "path";
+const swaggerDoc = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "swagger.json"), "utf8")
+);
 
 const app = express();
 
