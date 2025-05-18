@@ -6,6 +6,8 @@ import { connectDB } from "./config/db";
 import { setupSwagger } from "./config/swagger";
 import cors from "cors";
 import allRoutes from "./ruotes/index";
+import swaggerUi from "swagger-ui-express";
+import swaggerDoc from "../swagger.json";
 
 const app = express();
 
@@ -24,6 +26,8 @@ app.use(
   })
 );
 app.use(express.json());
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
 setupSwagger(app);
 
