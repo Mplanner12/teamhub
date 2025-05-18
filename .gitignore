@@ -43,8 +43,6 @@ coverage/
 .DS_Store
 Thumbs.db
 
-# npm package lock v1 
-package-lock.json
 
 # Yarn lock file v1
 yarn.lock

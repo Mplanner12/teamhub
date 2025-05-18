@@ -21,7 +21,7 @@ interface TaskForNotification extends mongoose.Document {
   _id: MongooseTypes.ObjectId;
   title: string;
   createdBy: PopulatedUser | MongooseTypes.ObjectId;
-  assignedTo?: PopulatedUser | MongooseTypes.ObjectId;
+  assignedTo?: (PopulatedUser | MongooseTypes.ObjectId)[]; // Corrected to be an array
   status?: string; // For status update notifications
   attachments: string[]; // Add the attachments property
 }
@@ -122,12 +122,20 @@ export const updateTaskStatus = async (
   ) {
     recipientsToNotify.add(task.createdBy._id.toString());
   }
-  if (
-    task.assignedTo &&
-    typeof task.assignedTo === "object" &&
-    task.assignedTo._id.toString() !== updater._id.toString()
-  ) {
-    recipientsToNotify.add(task.assignedTo._id.toString());
+
+  // Correctly handle assignedTo as an array
+  if (task.assignedTo && Array.isArray(task.assignedTo)) {
+    for (const assignee of task.assignedTo) {
+      if (assignee) { // Ensure assignee is not null/undefined
+        const assigneeIdStr =
+          typeof assignee === "object" && (assignee as PopulatedUser)._id
+            ? (assignee as PopulatedUser)._id.toString()
+            : assignee.toString();
+        if (assigneeIdStr !== updater._id.toString()) {
+          recipientsToNotify.add(assigneeIdStr);
+        }
+      }
+    }
   }
 
   if (recipientsToNotify.size > 0) {
@@ -201,22 +209,37 @@ export const addComment = async (
 
   // --- Notification Logic for New Comment ---
   const recipientsToNotify = new Set<string>();
-  if (
-    task.createdBy &&
-    typeof task.createdBy === "object" &&
-    task.createdBy._id.toString() !== commenter._id.toString()
-  ) {
-    recipientsToNotify.add(task.createdBy._id.toString());
+  if (task.createdBy) {
+    const createdByIdString =
+      typeof task.createdBy === "object" &&
+      (task.createdBy as PopulatedUser)._id
+        ? (task.createdBy as PopulatedUser)._id.toString()
+        : task.createdBy.toString();
+
+    if (createdByIdString !== commenter._id.toString()) {
+      recipientsToNotify.add(createdByIdString);
+    }
   }
-  if (
-    task.assignedTo &&
-    typeof task.assignedTo === "object" &&
-    task.assignedTo._id.toString() !== commenter._id.toString()
-  ) {
-    recipientsToNotify.add(task.assignedTo._id.toString());
+
+  if (task.assignedTo && Array.isArray(task.assignedTo)) {
+    for (const assignee of task.assignedTo) {
+      if (assignee) {
+        // Ensure assignee is not null/undefined
+        const assigneeIdStr =
+          typeof assignee === "object" && (assignee as PopulatedUser)._id
+            ? (assignee as PopulatedUser)._id.toString()
+            : assignee.toString();
+
+        if (assigneeIdStr !== commenter._id.toString()) {
+          recipientsToNotify.add(assigneeIdStr);
+        }
+      }
+    }
   }
 
   if (recipientsToNotify.size > 0) {
+    // The line number 214 from your error message might be around here or within the loop below,
+    // depending on exact formatting and comments. The changes above address the ._id.toString() issue.
     const notificationTitle = "New Comment on Task";
     const notificationMessage = `${
       commenter.fullName || "Someone"
