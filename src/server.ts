@@ -9,6 +9,7 @@ import allRoutes from "./ruotes/index";
 import swaggerUi from "swagger-ui-express";
 import fs from "fs";
 import path from "path";
+
 const swaggerDoc = JSON.parse(
   fs.readFileSync(path.join(__dirname, "swagger.json"), "utf8")
 );

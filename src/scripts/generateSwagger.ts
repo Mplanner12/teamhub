@@ -14,4 +14,4 @@ const swaggerSpec = swaggerJSDoc({
   apis: ["./src/modules/**/*.js"],
 });
 
-fs.writeFileSync("./swagger.json", JSON.stringify(swaggerSpec, null, 2));
+fs.writeFileSync("dist/swagger.json", JSON.stringify(swaggerSpec, null, 2));
