@@ -10,7 +10,8 @@ const swaggerSpec = swaggerJSDoc({
       version: "1.0.0",
       description: "TeamHub backend API docs powered by Plannorium",
     },
-    servers: [{ url: "https://localhost:8000" }],
+    // servers: [{ url: "https://localhost:8000" }],
+    servers: [{ url: "https://teamhub-87t6.onrender.com/" }],
   },
   apis: ["./src/modules/**/*.ts"],
 });
