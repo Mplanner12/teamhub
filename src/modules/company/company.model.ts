@@ -3,7 +3,11 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface ICompany extends Document {
   name: string;
   description?: string;
-  createdBy: mongoose.Types.ObjectId;
+  createdBy: {
+    type: Schema.Types.ObjectId;
+    ref: "User";
+    required: true;
+  };
   contactEmail: string;
   owner: mongoose.Types.ObjectId;
   phone?: string;
@@ -25,6 +29,11 @@ const companySchema = new Schema<ICompany>(
       trim: true,
     },
     owner: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    createdBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,

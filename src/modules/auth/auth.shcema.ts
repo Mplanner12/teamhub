@@ -9,6 +9,8 @@ export interface IUser extends Document {
   role: "superAdmin" | "admin" | "member";
   companyId?: mongoose.Types.ObjectId;
   isVerified: boolean;
+  refreshToken?: string;
+  refreshTokenExpires?: Date;
 }
 
 const userSchema = new Schema<IUser>(
@@ -24,6 +26,8 @@ const userSchema = new Schema<IUser>(
     },
     companyId: { type: Schema.Types.ObjectId, ref: "Company" },
     isVerified: { type: Boolean, default: false },
+    refreshToken: { type: String },
+    refreshTokenExpires: { type: Date },
   },
   { timestamps: true }
 );

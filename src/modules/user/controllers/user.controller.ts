@@ -79,12 +79,14 @@ export const loginUser = async (req: Request, res: Response) => {
   res.status(200).json({ token, user });
 };
 
+// ✅ Get all users in companyexport const getUsers = async (req: AuthenticatedRequest, res: Response) => {
 // ✅ Get all users in company
 export const getUsers = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const users = await UserModel.find({
-      companyId: req.user!.companyId,
-    }).select("-password");
+    if (!req.user) {
+      return res.status(400).json({ message: "User missing" });
+    }
+    const users = await UserModel.find().select("-password");
     res.status(200).json(users);
   } catch (err) {
     res.status(500).json({ message: "Failed to get users", error: err });

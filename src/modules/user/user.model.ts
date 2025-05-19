@@ -16,6 +16,8 @@ export interface IUserDocument extends Document {
   avatar?: string;
   createdAt: Date;
   updatedAt: Date;
+  refreshToken?: string;
+  refreshTokenExpires?: Date;
 
   // Declare the instance method
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -37,6 +39,8 @@ const userSchema = new Schema<IUserDocument>(
     resetPasswordExpires: { type: Date },
     companyId: { type: Schema.Types.ObjectId, ref: "Company" },
     avatar: { type: String },
+    refreshToken: { type: String },
+    refreshTokenExpires: { type: Date },
   },
   { timestamps: true }
 );

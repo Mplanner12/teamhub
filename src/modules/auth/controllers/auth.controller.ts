@@ -7,8 +7,19 @@ import { AuthenticatedRequest } from "../../../middlewares/auth.middleware";
 // Import the InvitationModel (assuming it's created as described above)
 import { InvitationModel } from "../../invitation/invitation.model";
 
-const generateToken = (id: string) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET!, { expiresIn: "7d" });
+const ACCESS_TOKEN_EXPIRES_IN = "15m"; // Short-lived access token
+const REFRESH_TOKEN_EXPIRES_IN_MS = 7 * 24 * 60 * 60 * 1000;
+const REFRESH_TOKEN_EXPIRES_IN_JWT = "7d";
+
+const generateAccessToken = (userId: string) => {
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET!, {
+    expiresIn: ACCESS_TOKEN_EXPIRES_IN,
+  });
+};
+const generateRefreshToken = (userId: string) => {
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET!, {
+    expiresIn: REFRESH_TOKEN_EXPIRES_IN_JWT,
+  });
 };
 
 export const registerController = async (
@@ -107,11 +118,29 @@ export const loginController = async (
       return;
     }
 
-    const token = generateToken(user._id.toString());
+    const accessToken = generateAccessToken(user._id.toString());
+    const refreshToken = generateRefreshToken(user._id.toString());
+
+    // Store refresh token in DB
+    user.refreshToken = refreshToken;
+    user.refreshTokenExpires = new Date(
+      Date.now() + REFRESH_TOKEN_EXPIRES_IN_MS
+    );
+    await user.save({ validateBeforeSave: false }); // Save without running all validators if not needed for this update
+
     // Exclude password from the returned user object
     const userObject = user.toObject();
     delete userObject.password;
-    res.status(200).json({ token, user: userObject });
+
+    res
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // Set to true in production
+        sameSite: "strict", // Or "lax" depending on your needs
+        maxAge: REFRESH_TOKEN_EXPIRES_IN_MS,
+      })
+      .status(200)
+      .json({ token: accessToken, user: userObject });
   } catch (error) {
     next(error);
   }
@@ -141,6 +170,74 @@ export const verifyEmailController = async (
   } catch (error) {
     next(error);
   }
+};
+
+export const refreshTokenController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const refreshTokenFromCookie = req.cookies.refreshToken;
+
+  if (!refreshTokenFromCookie) {
+    res.status(401).json({ message: "Refresh token not found" });
+    return;
+  }
+
+  try {
+    const decoded = jwt.verify(
+      refreshTokenFromCookie,
+      process.env.JWT_SECRET!
+    ) as { id: string; iat: number; exp: number };
+    const user = await UserModel.findOne({
+      _id: decoded.id,
+      refreshToken: refreshTokenFromCookie,
+      refreshTokenExpires: { $gt: new Date() },
+    });
+
+    if (!user) {
+      res.status(403).json({ message: "Invalid or expired refresh token." });
+      return;
+    }
+
+    const newAccessToken = generateAccessToken(user._id.toString());
+    res.status(200).json({ token: newAccessToken });
+  } catch (error) {
+    // This catches JWT errors (malformed, expired signature, etc.)
+    // or other unexpected errors.
+    res.status(403).json({ message: "Invalid or expired refresh token." });
+  }
+};
+
+export const logoutController = async (
+  req: Request, // Can be AuthenticatedRequest if you need user context for logging
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const refreshTokenFromCookie = req.cookies.refreshToken;
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+
+  if (refreshTokenFromCookie) {
+    try {
+      const decoded = jwt.decode(refreshTokenFromCookie) as {
+        id: string;
+      } | null; // Decode without verification first
+      if (decoded && decoded.id) {
+        await UserModel.updateOne(
+          { _id: decoded.id, refreshToken: refreshTokenFromCookie },
+          { $unset: { refreshToken: 1, refreshTokenExpires: 1 } }
+        );
+      }
+    } catch (error) {
+      /* Ignore errors here, main goal is to clear cookie */
+    }
+  }
+  res.status(200).json({ message: "Logged out successfully" });
 };
 
 export const changeRoleController = async (

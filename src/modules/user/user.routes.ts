@@ -92,7 +92,13 @@ const router = express.Router();
  *       401:
  *         description: Unauthorized
  */
-router.get("/", getUsers);
+router.get("/", authenticate, async (req, res, next) => {
+  try {
+    await getUsers(req, res);
+  } catch (err) {
+    next(err);
+  }
+});
 
 /**
  * @swagger
@@ -124,6 +130,6 @@ router.get("/", getUsers);
  *       401:
  *         description: Unauthorized
  */
-router.put("/profile", updateProfile);
+router.put("/profile", authenticate, updateProfile);
 
 export default router;

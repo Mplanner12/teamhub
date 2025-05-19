@@ -12,6 +12,8 @@ import {
   resetPasswordController,
   inviteUserController, // Added
   acceptInvitationController, // Added
+  refreshTokenController, // Added
+  logoutController, // Added
 } from "./controllers/auth.controller";
 
 const router = Router();
@@ -57,8 +59,16 @@ router.post("/register", registerController);
  *             $ref: '#/components/schemas/LoginCredentials' # Assuming LoginCredentials is defined elsewhere or in user.routes.ts
  *     responses:
  *       200:
- *         description: Login successful, returns user and token
- *         # Define response schema with token and user
+ *         description: Login successful. Returns access token in body and refresh token in an HTTP-only cookie.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User' # Assuming User schema is defined
  *       400:
  *         description: Invalid credentials or user not verified
  */
@@ -253,5 +263,44 @@ router.post("/accept-invitation", acceptInvitationController);
  *         description: Invitation token not found
  */
 router.post("/accept-invitation", acceptInvitationController);
+
+/**
+ * @swagger
+ * /auth/refresh-token:
+ *   post:
+ *     summary: Refresh an access token
+ *     tags: [Authentication]
+ *     description: Uses an HTTP-only refresh token cookie to issue a new access token.
+ *     responses:
+ *       200:
+ *         description: New access token generated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *       401:
+ *         description: Refresh token not found or cookie missing.
+ *       403:
+ *         description: Invalid or expired refresh token.
+ */
+router.post("/refresh-token", refreshTokenController);
+
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Log out a user
+ *     tags: [Authentication]
+ *     description: Clears the refresh token cookie and invalidates the token on the server.
+ *     responses:
+ *       200:
+ *         description: Logged out successfully.
+ *       401:
+ *         description: Unauthorized (though typically logout should succeed even if not authenticated by clearing any session info).
+ */
+router.post("/logout", logoutController);
 
 export default router;
