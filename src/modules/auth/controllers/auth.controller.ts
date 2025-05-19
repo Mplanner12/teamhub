@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 import { UserModel } from "../../user/user.model";
 import { sendEmail } from "../../../utils/sendEmail";
 import { AuthenticatedRequest } from "../../../middlewares/auth.middleware";
+// Import the InvitationModel (assuming it's created as described above)
+import { InvitationModel } from "../../invitation/invitation.model";
 
 const generateToken = (id: string) => {
   return jwt.sign({ id }, process.env.JWT_SECRET!, { expiresIn: "7d" });
@@ -16,18 +18,32 @@ export const registerController = async (
 ): Promise<void> => {
   try {
     const { fullName, email, password, companyId } = req.body;
+
+    // Check if this is the very first user in the system
+    // const existingUserCount = await UserModel.countDocuments();
+    let role = "superAdmin";
+
+    // if (existingUserCount === 0) {
+    //   role = "superAdmin";
+    // } else {
+    //   res.status(403).json({
+    //     message: "Direct registration is disabled. Users must be invited.",
+    //   });
+    //   return;
+    // }
+
     const userExists = await UserModel.findOne({ email });
     if (userExists) {
       res.status(400).json({ message: "User already exists" });
       return;
     }
-
     const verificationToken = crypto.randomBytes(32).toString("hex");
     const newUser = await UserModel.create({
       fullName,
       email,
       password,
       companyId,
+      role,
       verificationToken,
     });
 
@@ -219,5 +235,132 @@ export const resetPasswordController = async (
   }
 };
 
-// sendVerifyEmailController is effectively covered by registerController now.
-// If you need a separate endpoint to resend verification, we can add that.
+export const inviteUserController = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { email: emailToInvite, role: roleToAssign } = req.body;
+    const invitingUser = req.user!;
+
+    if (!["admin", "member"].includes(roleToAssign)) {
+      res
+        .status(400)
+        .json({ message: "Invalid role specified for invitation." });
+      return;
+    }
+
+    const existingUser = await UserModel.findOne({ email: emailToInvite });
+    if (existingUser) {
+      res
+        .status(400)
+        .json({ message: `User with email ${emailToInvite} already exists.` });
+      return;
+    }
+
+    const existingInvitation = await InvitationModel.findOne({
+      email: emailToInvite,
+      status: "pending",
+      invitationTokenExpires: { $gt: new Date() },
+    });
+
+    if (existingInvitation) {
+      res.status(400).json({
+        message: `An active invitation already exists for ${emailToInvite}. You can resend it or wait for it to expire.`,
+      });
+      return;
+    }
+
+    const invitationToken = crypto.randomBytes(32).toString("hex");
+    const invitationTokenExpires = new Date(Date.now() + 24 * 3600000);
+
+    await InvitationModel.create({
+      email: emailToInvite,
+      role: roleToAssign,
+      companyId: invitingUser.companyId,
+      invitationToken,
+      invitationTokenExpires,
+      invitedBy: invitingUser._id,
+    });
+
+    const acceptInvitationUrl = `${process.env.FRONTEND_URL}/accept-invitation?token=${invitationToken}`;
+
+    const htmlContent = `
+    <h2>You're Invited to Join TeamHub!</h2>
+    <p>You have been invited by ${invitingUser.fullName} to join their team on TeamHub as a(n) ${roleToAssign}.</p>
+    <p>To accept this invitation and create your account, please click the link below:</p>
+    <p><a href="${acceptInvitationUrl}">Accept Invitation & Create Account</a></p>
+    <p>This link will expire in 24 hours.</p>
+    <p>If you have any issues or concerns, please contact ${invitingUser.email}.</p>
+    <p>Best regards,</p>
+    <p>The TeamHub Team</p>
+    `;
+
+    await sendEmail(
+      emailToInvite,
+      `You're Invited to TeamHub by ${invitingUser.fullName}!`,
+      htmlContent
+    );
+
+    res.status(200).json({ message: `Invitation sent to ${emailToInvite}.` });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const acceptInvitationController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { token } = req.query as { token: string };
+    const { fullName, password } = req.body;
+
+    if (!token) {
+      res.status(400).json({ message: "Invitation token is missing." });
+      return;
+    }
+
+    const invitation = await InvitationModel.findOne({
+      invitationToken: token,
+      status: "pending",
+      invitationTokenExpires: { $gt: new Date() },
+    });
+
+    if (!invitation) {
+      res.status(400).json({
+        message: "Invitation token is invalid, expired, or already used.",
+      });
+      return;
+    }
+
+    const userExists = await UserModel.findOne({ email: invitation.email });
+    if (userExists) {
+      res
+        .status(400)
+        .json({ message: "An account with this email already exists." });
+      return;
+    }
+
+    const newUser = await UserModel.create({
+      fullName,
+      email: invitation.email,
+      password,
+      role: invitation.role,
+      companyId: invitation.companyId,
+      isVerified: true,
+    });
+
+    invitation.status = "accepted";
+    await invitation.save();
+
+    res.status(201).json({
+      message: "Account created successfully from invitation.",
+      userId: newUser._id,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

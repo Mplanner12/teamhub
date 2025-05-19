@@ -10,6 +10,8 @@ import {
   changeRoleController,
   sendResetController,
   resetPasswordController,
+  inviteUserController, // Added
+  acceptInvitationController, // Added
 } from "./controllers/auth.controller";
 
 const router = Router();
@@ -174,5 +176,48 @@ router.post("/forgot-password", sendResetController);
  *         description: Invalid token or password format
  */
 router.post("/reset-password", resetPasswordController);
+
+/**
+ * @swagger
+ * /auth/invite-user:
+ *   post:
+ *     summary: Invite a new user (SuperAdmin only)
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, role]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               role:
+ *                 type: string
+ *                 enum: [admin, member] # Roles superAdmin can invite
+ *     responses:
+ *       200:
+ *         description: Invitation sent successfully
+ *       400:
+ *         description: Invalid input, user already exists, or invalid role
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden (not a superAdmin)
+ */
+router.post(
+  "/invite-user",
+  authenticate,
+  roleGuard(["superAdmin"]),
+  inviteUserController
+);
+
+// This route would typically be hit by a user clicking a link from an email
+// The frontend would then make a POST request to this endpoint with the token and user details
+router.post("/accept-invitation", acceptInvitationController);
 
 export default router;

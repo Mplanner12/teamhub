@@ -10,8 +10,18 @@ const swaggerSpec = swaggerJSDoc({
       version: "1.0.0",
       description: "TeamHub backend API docs powered by Plannorium",
     },
-    // servers: [{ url: "https://localhost:8000" }],
-    servers: [{ url: "https://teamhub-87t6.onrender.com/" }],
+
+    servers: [
+      { url: "http://localhost:8000", description: "Local server" },
+      {
+        url: "https://teamhub-six.vercel.app",
+        description: "Vercel production",
+      },
+      {
+        url: "https://teamhub-87t6.onrender.com",
+        description: "Render production",
+      },
+    ],
   },
   apis: ["./src/modules/**/*.ts"],
 });
