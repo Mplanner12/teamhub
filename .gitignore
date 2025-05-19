@@ -65,7 +65,10 @@ yarn.lock
 
 # Ignore all files in the root except the ones explicitly tracked
 /*
-!/.*
+# Un-ignore specific dotfiles you want to track in the root.
+# For example:
+# !/.gitattributes
+# !/.eslintrc.js
 !/.gitignore
 !/package.json
 !/package-lock.json # or !/yarn.lock
