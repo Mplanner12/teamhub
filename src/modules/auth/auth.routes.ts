@@ -220,4 +220,38 @@ router.post(
 // The frontend would then make a POST request to this endpoint with the token and user details
 router.post("/accept-invitation", acceptInvitationController);
 
+/**
+ * @swagger
+ * /auth/accept-invitation:
+ *   post:
+ *     summary: Accept a user invitation and set up the account
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [token, password, name]
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: The invitation token received via email
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 description: The password for the new account
+ *               name:
+ *                 type: string
+ *                 description: The name of the new user
+ *     responses:
+ *       200:
+ *         description: Invitation accepted successfully, user account created/activated. Returns user details and authentication token.
+ *       400:
+ *         description: Invalid token, token expired, or invalid input (e.g., password format, name missing)
+ *       404:
+ *         description: Invitation token not found
+ */
+router.post("/accept-invitation", acceptInvitationController);
+
 export default router;

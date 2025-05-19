@@ -23,9 +23,7 @@
     "/auth/register": {
       "post": {
         "summary": "Register a new user",
-        "tags": [
-          "Authentication"
-        ],
+        "tags": ["Authentication"],
         "requestBody": {
           "required": true,
           "content": {
@@ -49,9 +47,7 @@
     "/auth/login": {
       "post": {
         "summary": "Log in a user",
-        "tags": [
-          "Authentication"
-        ],
+        "tags": ["Authentication"],
         "requestBody": {
           "required": true,
           "content": {
@@ -75,9 +71,7 @@
     "/auth/verify/{token}": {
       "get": {
         "summary": "Verify user's email address using a token from the email link",
-        "tags": [
-          "Authentication"
-        ],
+        "tags": ["Authentication"],
         "parameters": [
           {
             "in": "path",
@@ -102,9 +96,7 @@
     "/auth/change-role": {
       "post": {
         "summary": "Change a user's role (Admin/SuperAdmin only) - Duplicates user.routes.ts endpoint",
-        "tags": [
-          "Authentication"
-        ],
+        "tags": ["Authentication"],
         "security": [
           {
             "bearerAuth": []
@@ -116,21 +108,14 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "userId",
-                  "newRole"
-                ],
+                "required": ["userId", "newRole"],
                 "properties": {
                   "userId": {
                     "type": "string"
                   },
                   "newRole": {
                     "type": "string",
-                    "enum": [
-                      "user",
-                      "admin",
-                      "superAdmin"
-                    ]
+                    "enum": ["user", "admin", "superAdmin"]
                   }
                 }
               }
@@ -159,18 +144,14 @@
     "/auth/forgot-password": {
       "post": {
         "summary": "Send a password reset link",
-        "tags": [
-          "Authentication"
-        ],
+        "tags": ["Authentication"],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "email"
-                ],
+                "required": ["email"],
                 "properties": {
                   "email": {
                     "type": "string",
@@ -194,19 +175,14 @@
     "/auth/reset-password": {
       "post": {
         "summary": "Reset user's password using a token",
-        "tags": [
-          "Authentication"
-        ],
+        "tags": ["Authentication"],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "token",
-                  "newPassword"
-                ],
+                "required": ["token", "newPassword"],
                 "properties": {
                   "token": {
                     "type": "string"
@@ -233,9 +209,7 @@
     "/auth/invite-user": {
       "post": {
         "summary": "Invite a new user (SuperAdmin only)",
-        "tags": [
-          "Authentication"
-        ],
+        "tags": ["Authentication"],
         "security": [
           {
             "bearerAuth": []
@@ -247,10 +221,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "email",
-                  "role"
-                ],
+                "required": ["email", "role"],
                 "properties": {
                   "email": {
                     "type": "string",
@@ -258,10 +229,7 @@
                   },
                   "role": {
                     "type": "string",
-                    "enum": [
-                      "admin",
-                      "member"
-                    ]
+                    "enum": ["admin", "member"]
                   }
                 }
               }
@@ -284,12 +252,53 @@
         }
       }
     },
+    "/auth/accept-invitation": {
+      "post": {
+        "summary": "Accept a user invitation and set up the account",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["token", "password", "name"],
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "description": "The invitation token received via email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "description": "The password for the new account"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The name of the new user"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Invitation accepted successfully, user account created/activated. Returns user details and authentication token."
+          },
+          "400": {
+            "description": "Invalid token, token expired, or invalid input (e.g., password format, name missing)"
+          },
+          "404": {
+            "description": "Invitation token not found"
+          }
+        }
+      }
+    },
     "/calendar/": {
       "post": {
         "summary": "Create a new calendar event",
-        "tags": [
-          "Calendar"
-        ],
+        "tags": ["Calendar"],
         "security": [
           {
             "bearerAuth": []
@@ -301,11 +310,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "title",
-                  "startTime",
-                  "endTime"
-                ],
+                "required": ["title", "startTime", "endTime"],
                 "properties": {
                   "title": {
                     "type": "string"
@@ -353,9 +358,7 @@
       },
       "get": {
         "summary": "Get all calendar events for the authenticated user's company",
-        "tags": [
-          "Calendar"
-        ],
+        "tags": ["Calendar"],
         "security": [
           {
             "bearerAuth": []
@@ -384,9 +387,7 @@
     "/api/calls/initiate": {
       "post": {
         "summary": "Initiate a voice or video call",
-        "tags": [
-          "Calls"
-        ],
+        "tags": ["Calls"],
         "security": [
           {
             "bearerAuth": []
@@ -398,20 +399,14 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "toUserId",
-                  "type"
-                ],
+                "required": ["toUserId", "type"],
                 "properties": {
                   "toUserId": {
                     "type": "string"
                   },
                   "type": {
                     "type": "string",
-                    "enum": [
-                      "video",
-                      "voice"
-                    ]
+                    "enum": ["video", "voice"]
                   }
                 }
               }
@@ -434,9 +429,7 @@
     "/api/chats/{receiverId}": {
       "get": {
         "summary": "Get chat history with a specific user",
-        "tags": [
-          "Chat"
-        ],
+        "tags": ["Chat"],
         "security": [
           {
             "bearerAuth": []
@@ -476,9 +469,7 @@
     "/api/companies/": {
       "post": {
         "summary": "Create a new company",
-        "tags": [
-          "Companies"
-        ],
+        "tags": ["Companies"],
         "security": [
           {
             "bearerAuth": []
@@ -491,10 +482,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "name",
-                  "contactEmail"
-                ],
+                "required": ["name", "contactEmail"],
                 "properties": {
                   "name": {
                     "type": "string"
@@ -548,9 +536,7 @@
       },
       "get": {
         "summary": "Get all companies",
-        "tags": [
-          "Companies"
-        ],
+        "tags": ["Companies"],
         "security": [
           {
             "bearerAuth": []
@@ -572,9 +558,7 @@
     "/api/companies/{companyId}": {
       "put": {
         "summary": "Update a company",
-        "tags": [
-          "Companies"
-        ],
+        "tags": ["Companies"],
         "security": [
           {
             "bearerAuth": []
@@ -628,9 +612,7 @@
     "/api/documents/upload": {
       "post": {
         "summary": "Upload a new document",
-        "tags": [
-          "Documents"
-        ],
+        "tags": ["Documents"],
         "security": [
           {
             "bearerAuth": []
@@ -683,9 +665,7 @@
     "/api/documents/": {
       "get": {
         "summary": "Get all documents for the authenticated user's company",
-        "tags": [
-          "Documents"
-        ],
+        "tags": ["Documents"],
         "security": [
           {
             "bearerAuth": []
@@ -714,9 +694,7 @@
     "/api/notifications/my": {
       "get": {
         "summary": "Retrieve notifications for the authenticated user",
-        "tags": [
-          "Notifications"
-        ],
+        "tags": ["Notifications"],
         "security": [
           {
             "bearerAuth": []
@@ -748,9 +726,7 @@
     "/api/notifications/{id}/read": {
       "patch": {
         "summary": "Mark a specific notification as read",
-        "tags": [
-          "Notifications"
-        ],
+        "tags": ["Notifications"],
         "security": [
           {
             "bearerAuth": []
@@ -793,9 +769,7 @@
     "/api/notifications/mark-all-as-read": {
       "patch": {
         "summary": "Mark all unread notifications for the user as read",
-        "tags": [
-          "Notifications"
-        ],
+        "tags": ["Notifications"],
         "security": [
           {
             "bearerAuth": []
@@ -817,9 +791,7 @@
     "/api/notifications/unread-count": {
       "get": {
         "summary": "Get the count of unread notifications for the authenticated user",
-        "tags": [
-          "Notifications"
-        ],
+        "tags": ["Notifications"],
         "security": [
           {
             "bearerAuth": []
@@ -853,9 +825,7 @@
     "/api/sub-companies/": {
       "post": {
         "summary": "Create a new sub-company",
-        "tags": [
-          "SubCompanies"
-        ],
+        "tags": ["SubCompanies"],
         "security": [
           {
             "bearerAuth": []
@@ -867,10 +837,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "name",
-                  "parentCompanyId"
-                ],
+                "required": ["name", "parentCompanyId"],
                 "properties": {
                   "name": {
                     "type": "string"
@@ -902,9 +869,7 @@
     "/api/sub-companies/{parentCompanyId}": {
       "get": {
         "summary": "Get sub-companies for a parent company",
-        "tags": [
-          "SubCompanies"
-        ],
+        "tags": ["SubCompanies"],
         "security": [
           {
             "bearerAuth": []
@@ -937,9 +902,7 @@
     "/api/sub-companies/{subCompanyId}/assign": {
       "put": {
         "summary": "Assign users to a sub-company",
-        "tags": [
-          "SubCompanies"
-        ],
+        "tags": ["SubCompanies"],
         "security": [
           {
             "bearerAuth": []
@@ -962,9 +925,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "userIds"
-                ],
+                "required": ["userIds"],
                 "properties": {
                   "userIds": {
                     "type": "array",
@@ -996,9 +957,7 @@
     "/api/tasks/": {
       "post": {
         "summary": "Create a new task",
-        "tags": [
-          "Tasks"
-        ],
+        "tags": ["Tasks"],
         "security": [
           {
             "bearerAuth": []
@@ -1010,9 +969,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "title"
-                ],
+                "required": ["title"],
                 "properties": {
                   "title": {
                     "type": "string"
@@ -1033,11 +990,7 @@
                   },
                   "priority": {
                     "type": "string",
-                    "enum": [
-                      "low",
-                      "medium",
-                      "high"
-                    ]
+                    "enum": ["low", "medium", "high"]
                   }
                 }
               }
@@ -1067,9 +1020,7 @@
     "/api/tasks/{teamId}": {
       "get": {
         "summary": "Get tasks for a specific team",
-        "tags": [
-          "Tasks"
-        ],
+        "tags": ["Tasks"],
         "security": [
           {
             "bearerAuth": []
@@ -1112,9 +1063,7 @@
     "/api/tasks/{taskId}/status": {
       "patch": {
         "summary": "Update the status of a task",
-        "tags": [
-          "Tasks"
-        ],
+        "tags": ["Tasks"],
         "security": [
           {
             "bearerAuth": []
@@ -1137,9 +1086,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "status"
-                ],
+                "required": ["status"],
                 "properties": {
                   "status": {
                     "type": "string"
@@ -1175,9 +1122,7 @@
     "/api/tasks/{taskId}/comment": {
       "post": {
         "summary": "Add a comment to a task",
-        "tags": [
-          "Tasks"
-        ],
+        "tags": ["Tasks"],
         "security": [
           {
             "bearerAuth": []
@@ -1200,9 +1145,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "text"
-                ],
+                "required": ["text"],
                 "properties": {
                   "text": {
                     "type": "string"
@@ -1238,9 +1181,7 @@
     "/api/tasks/{taskId}/attachment": {
       "post": {
         "summary": "Upload an attachment to a task",
-        "tags": [
-          "Tasks"
-        ],
+        "tags": ["Tasks"],
         "security": [
           {
             "bearerAuth": []
@@ -1292,9 +1233,7 @@
     "/teams/create": {
       "post": {
         "summary": "Create a new team (Admin/SuperAdmin only)",
-        "tags": [
-          "Teams"
-        ],
+        "tags": ["Teams"],
         "security": [
           {
             "bearerAuth": []
@@ -1306,11 +1245,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "name",
-                  "companyId",
-                  "lead"
-                ],
+                "required": ["name", "companyId", "lead"],
                 "properties": {
                   "name": {
                     "type": "string"
@@ -1353,9 +1288,7 @@
     "/teams/company/{companyId}": {
       "get": {
         "summary": "Get all teams for a specific company",
-        "tags": [
-          "Teams"
-        ],
+        "tags": ["Teams"],
         "security": [
           {
             "bearerAuth": []
@@ -1398,9 +1331,7 @@
     "/teams/add-member": {
       "put": {
         "summary": "Add a member to a team (Admin only)",
-        "tags": [
-          "Teams"
-        ],
+        "tags": ["Teams"],
         "security": [
           {
             "bearerAuth": []
@@ -1412,10 +1343,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "teamId",
-                  "userId"
-                ],
+                "required": ["teamId", "userId"],
                 "properties": {
                   "teamId": {
                     "type": "string"
@@ -1457,9 +1385,7 @@
     "/teams/remove-member": {
       "put": {
         "summary": "Remove a member from a team (Admin only)",
-        "tags": [
-          "Teams"
-        ],
+        "tags": ["Teams"],
         "security": [
           {
             "bearerAuth": []
@@ -1471,10 +1397,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "teamId",
-                  "userId"
-                ],
+                "required": ["teamId", "userId"],
                 "properties": {
                   "teamId": {
                     "type": "string"
@@ -1516,9 +1439,7 @@
     "/teams/update-lead": {
       "put": {
         "summary": "Update the lead of a team (Admin only)",
-        "tags": [
-          "Teams"
-        ],
+        "tags": ["Teams"],
         "security": [
           {
             "bearerAuth": []
@@ -1530,10 +1451,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "teamId",
-                  "leadId"
-                ],
+                "required": ["teamId", "leadId"],
                 "properties": {
                   "teamId": {
                     "type": "string"
@@ -1575,9 +1493,7 @@
     "/api/users/": {
       "get": {
         "summary": "Get a list of users (requires authentication)",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [
           {
             "bearerAuth": []
@@ -1606,9 +1522,7 @@
     "/api/users/profile": {
       "put": {
         "summary": "Update authenticated user's profile",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "security": [
           {
             "bearerAuth": []
@@ -1808,13 +1722,7 @@
           },
           "type": {
             "type": "string",
-            "enum": [
-              "task",
-              "calendar",
-              "chat",
-              "document",
-              "team"
-            ],
+            "enum": ["task", "calendar", "chat", "document", "team"],
             "description": "The type of notification."
           },
           "message": {
@@ -1899,11 +1807,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "To Do",
-              "In Progress",
-              "Done"
-            ]
+            "enum": ["To Do", "In Progress", "Done"]
           },
           "dueDate": {
             "type": "string",
@@ -1911,11 +1815,7 @@
           },
           "priority": {
             "type": "string",
-            "enum": [
-              "Low",
-              "Medium",
-              "High"
-            ]
+            "enum": ["Low", "Medium", "High"]
           },
           "attachments": {
             "type": "array",
@@ -2002,11 +1902,7 @@
           },
           "role": {
             "type": "string",
-            "enum": [
-              "user",
-              "admin",
-              "superAdmin"
-            ]
+            "enum": ["user", "admin", "superAdmin"]
           },
           "companyId": {
             "type": "string"
@@ -2023,10 +1919,7 @@
       },
       "LoginCredentials": {
         "type": "object",
-        "required": [
-          "email",
-          "password"
-        ],
+        "required": ["email", "password"],
         "properties": {
           "email": {
             "type": "string",
@@ -2040,12 +1933,7 @@
       },
       "UserRegistration": {
         "type": "object",
-        "required": [
-          "fullName",
-          "email",
-          "password",
-          "companyId"
-        ],
+        "required": ["fullName", "email", "password", "companyId"],
         "properties": {
           "fullName": {
             "type": "string"
