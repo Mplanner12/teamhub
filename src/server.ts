@@ -7,15 +7,16 @@ import { setupSwagger } from "./config/swagger";
 import cors from "cors";
 import allRoutes from "./ruotes/index";
 import swaggerUi from "swagger-ui-express";
-import fs from "fs";
 import path from "path";
+import fs from "fs";
 
-const swaggerPath = path.join(__dirname, "swagger.json");
+const swaggerPath = path.resolve(__dirname, "swagger.json");
 console.log("Looking for Swagger file at:", swaggerPath);
+
 if (!fs.existsSync(swaggerPath)) {
-  console.error("Swagger file not found at runtime! Expected at:", swaggerPath);
   throw new Error("Missing swagger.json in deployed environment.");
 }
+
 const swaggerDoc = JSON.parse(fs.readFileSync(swaggerPath, "utf8"));
 
 const app = express();

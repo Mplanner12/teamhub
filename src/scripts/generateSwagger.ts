@@ -10,12 +10,10 @@ const swaggerSpec = swaggerJSDoc({
       version: "1.0.0",
       description: "TeamHub backend API docs powered by Plannorium",
     },
-    servers: [{ url: "https://teamhub-six.vercel.app" }],
+    servers: [{ url: "https://localhost:8000" }],
   },
   apis: ["./src/modules/**/*.ts"],
 });
 
-fs.writeFileSync(
-  path.join(__dirname, "../swagger.json"),
-  JSON.stringify(swaggerSpec, null, 2)
-);
+const outputPath = path.resolve(__dirname, "../../dist/swagger.json");
+fs.writeFileSync(outputPath, JSON.stringify(swaggerSpec, null, 2));
