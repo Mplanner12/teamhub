@@ -15,5 +15,11 @@ const swaggerSpec = swaggerJSDoc({
   apis: ["./src/modules/**/*.ts"],
 });
 
-const outputPath = path.resolve(__dirname, "../../dist/swagger.json");
+const distDir = path.resolve(__dirname, "../../dist");
+if (!fs.existsSync(distDir)) {
+  fs.mkdirSync(distDir);
+}
+
+const outputPath = path.join(distDir, "swagger.json");
 fs.writeFileSync(outputPath, JSON.stringify(swaggerSpec, null, 2));
+console.log("✅ Swagger file written to:", outputPath);
