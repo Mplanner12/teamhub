@@ -203,8 +203,6 @@ export const refreshTokenController = async (
     const newAccessToken = generateAccessToken(user._id.toString());
     res.status(200).json({ token: newAccessToken });
   } catch (error) {
-    // This catches JWT errors (malformed, expired signature, etc.)
-    // or other unexpected errors.
     res.status(403).json({ message: "Invalid or expired refresh token." });
   }
 };

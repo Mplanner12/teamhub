@@ -9,6 +9,7 @@ import allRoutes from "./ruotes/index";
 import swaggerUi from "swagger-ui-express";
 import path from "path";
 import fs from "fs";
+import cookieParser from "cookie-parser";
 
 const swaggerPath = path.resolve(__dirname, "swagger.json");
 console.log("Looking for Swagger file at:", swaggerPath);
@@ -41,6 +42,7 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
