@@ -41,15 +41,31 @@ export const createCompany = async (
   res.status(201).json({ message: "Company created", company });
 };
 
-export const getAllCompanies = async (req: Request, res: Response) => {
-  const companies = await CompanyModel.find().populate(
-    "createdBy",
-    "fullName email"
-  );
+export const getAllCompanies = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  // Ensure req.user and req.user.email are available from the authentication middleware
+  if (!req.user || !req.user.email) {
+    res
+      .status(400)
+      .json({ message: "User email not found in authentication token." });
+    return;
+  }
+
+  const userEmail = req.user.email;
+
+  // Find companies where the contactEmail matches the authenticated user's email
+  const companies = await CompanyModel.find({
+    contactEmail: userEmail,
+  }).populate("createdBy", "fullName email");
   res.status(200).json(companies);
 };
 
-export const updateCompany = async (req: Request, res: Response) => {
+export const updateCompany = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { companyId } = req.params;
   const updates = req.body;
 
