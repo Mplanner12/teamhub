@@ -15,6 +15,8 @@ export const createCompany = async (
     website,
     industry,
     logoUrl,
+    createdBy,
+    owner,
   } = req.body;
 
   const companyExists = await CompanyModel.findOne({ contactEmail });
@@ -33,6 +35,7 @@ export const createCompany = async (
     industry,
     logoUrl,
     createdBy: req.user!.id,
+    owner: req.user!.id,
   });
 
   res.status(201).json({ message: "Company created", company });

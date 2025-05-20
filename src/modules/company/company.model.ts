@@ -3,11 +3,7 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface ICompany extends Document {
   name: string;
   description?: string;
-  createdBy: {
-    type: Schema.Types.ObjectId;
-    ref: "User";
-    required: true;
-  };
+  createdBy: mongoose.Types.ObjectId;
   contactEmail: string;
   owner: mongoose.Types.ObjectId;
   phone?: string;
