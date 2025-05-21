@@ -6,7 +6,7 @@ import { NotificationModel } from "../notifications/notification.model";
 import { emitNotification } from "../../utils/notificationEmitter";
 import { Server as SocketIOServer } from "socket.io";
 import mongoose, { Types as MongooseTypes } from "mongoose";
-import axios from "axios"; // Added for fetching file from URL
+import axios from "axios";
 
 interface CreatedDocument extends mongoose.Document {
   _id: MongooseTypes.ObjectId;
