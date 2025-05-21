@@ -3,6 +3,7 @@ import { authenticate } from "../../middlewares/auth.middleware";
 import {
   uploadDocument,
   getCompanyDocuments,
+  downloadDocument, // Import the new controller function
 } from "../document/document.controller";
 import { upload } from "../../middlewares/upload";
 
@@ -76,5 +77,39 @@ router.post("/upload", upload.single("file"), uploadDocument);
  *         description: Unauthorized
  */
 router.get("/", getCompanyDocuments);
+
+/**
+ * @swagger
+ * /api/documents/{documentId}/download:
+ *   get:
+ *     summary: Download a specific document
+ *     tags: [Documents]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: documentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the document to download.
+ *     responses:
+ *       200:
+ *         description: Document file stream.
+ *         content:
+ *           application/octet-stream: # Or the specific content type based on the file
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       400:
+ *         description: Invalid document ID format
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Document not found or access denied
+ *       500:
+ *         description: Failed to download document or fetch from storage
+ */
+router.get("/:documentId/download", downloadDocument);
 
 export default router;

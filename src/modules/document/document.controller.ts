@@ -6,6 +6,7 @@ import { NotificationModel } from "../notifications/notification.model";
 import { emitNotification } from "../../utils/notificationEmitter";
 import { Server as SocketIOServer } from "socket.io";
 import mongoose, { Types as MongooseTypes } from "mongoose";
+import axios from "axios"; // Added for fetching file from URL
 
 interface CreatedDocument extends mongoose.Document {
   _id: MongooseTypes.ObjectId;
@@ -109,4 +110,61 @@ export const getCompanyDocuments = async (
     .populate("uploadedBy", "fullName email");
   res.status(200).json(documents);
   // No explicit return needed here
+};
+
+export const downloadDocument = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  const { documentId } = req.params;
+  const companyId = req.user!.companyId;
+
+  if (!mongoose.Types.ObjectId.isValid(documentId)) {
+    res.status(400).json({ message: "Invalid document ID format" });
+    return;
+  }
+
+  try {
+    const document = await DocumentModel.findOne({
+      _id: documentId,
+      companyId: companyId, // Ensure the document belongs to the user's company
+    });
+
+    if (!document) {
+      res.status(404).json({ message: "Document not found or access denied" });
+      return;
+    }
+
+    // Assuming document model has fileUrl, fileName, and fileType fields
+    const fileUrl = document.get("fileUrl") as string;
+    const fileName = document.get("fileName") as string;
+    const fileType = document.get("fileType") as string;
+
+    const response = await axios({
+      method: "GET",
+      url: fileUrl,
+      responseType: "stream",
+    });
+
+    res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+    res.setHeader("Content-Type", fileType || "application/octet-stream"); // Fallback to octet-stream
+
+    response.data.pipe(res);
+  } catch (error) {
+    console.error("Error downloading document:", error);
+    if (axios.isAxiosError(error) && error.response) {
+      console.error(
+        "Storage request failed:",
+        error.response.status,
+        error.response.data
+      );
+      res.status(502).json({ message: "Failed to fetch file from storage" });
+    } else {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      res
+        .status(500)
+        .json({ message: "Failed to download document", error: errorMessage });
+    }
+  }
 };

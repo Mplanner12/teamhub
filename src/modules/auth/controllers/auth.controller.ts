@@ -126,17 +126,16 @@ export const loginController = async (
     user.refreshTokenExpires = new Date(
       Date.now() + REFRESH_TOKEN_EXPIRES_IN_MS
     );
-    await user.save({ validateBeforeSave: false }); // Save without running all validators if not needed for this update
+    await user.save({ validateBeforeSave: false });
 
-    // Exclude password from the returned user object
     const userObject = user.toObject();
     delete userObject.password;
 
     res
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production", // Set to true in production
-        sameSite: "strict", // Or "lax" depending on your needs
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
         maxAge: REFRESH_TOKEN_EXPIRES_IN_MS,
       })
       .status(200)
