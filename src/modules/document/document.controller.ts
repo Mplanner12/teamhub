@@ -11,6 +11,8 @@ import axios from "axios";
 interface CreatedDocument extends mongoose.Document {
   _id: MongooseTypes.ObjectId;
   fileName: string;
+  publicId?: string;
+  resourceType?: "image" | "video" | "raw" | "auto";
 }
 export const uploadDocument = async (
   req: AuthenticatedRequest,
@@ -44,6 +46,8 @@ export const uploadDocument = async (
     const uploadResult = await cloudinary.uploader.upload(dataURI, {
       folder: "teamhub/documents",
       resource_type: resourceType,
+      // It's highly recommended to store the public_id and resource_type
+      // returned by Cloudinary in your database for easier deletion later.
       format: fileExtension, // Provide the file extension as format for raw files
     });
 
@@ -60,6 +64,8 @@ export const uploadDocument = async (
       fileUrl: uploadResult.secure_url,
       fileType: file.mimetype,
       description,
+      publicId: uploadResult.public_id, // Store public ID
+      resourceType: resourceType, // Store resource type
       companyId: req.user!.companyId,
     })) as CreatedDocument;
 
@@ -166,5 +172,59 @@ export const downloadDocument = async (
         .status(500)
         .json({ message: "Failed to download document", error: errorMessage });
     }
+  }
+};
+
+export const deleteDocument = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  const { documentId } = req.params;
+  const companyId = req.user!.companyId;
+
+  if (!mongoose.Types.ObjectId.isValid(documentId)) {
+    res.status(400).json({ message: "Invalid document ID format" });
+    return;
+  }
+
+  try {
+    // Find the document first to get Cloudinary details and verify ownership
+    const document = await DocumentModel.findOne({
+      _id: documentId,
+      companyId: companyId, // Ensure the document belongs to the user's company
+    });
+
+    if (!document) {
+      res.status(404).json({ message: "Document not found or access denied" });
+      return;
+    }
+
+    // Assuming publicId and resourceType are stored in the document model
+    const publicId = document.get("publicId") as string | undefined;
+    const resourceType = document.get("resourceType") as
+      | "image"
+      | "video"
+      | "raw"
+      | "auto"
+      | undefined;
+
+    // Delete from Cloudinary if publicId is available
+    if (publicId && resourceType) {
+      await cloudinary.uploader.destroy(publicId, {
+        resource_type: resourceType,
+      });
+    } else {
+      console.warn(
+        `Cloudinary publicId or resourceType missing for document ${documentId}. Skipping Cloudinary deletion.`
+      );
+    }
+
+    // Delete from MongoDB
+    await DocumentModel.deleteOne({ _id: documentId, companyId: companyId });
+
+    res.status(200).json({ message: "Document deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting document:", error);
+    res.status(500).json({ message: "Failed to delete document", error });
   }
 };

@@ -4,6 +4,7 @@ import {
   uploadDocument,
   getCompanyDocuments,
   downloadDocument, // Import the new controller function
+  deleteDocument, // Import the new controller function
 } from "../document/document.controller";
 import { upload } from "../../middlewares/upload";
 
@@ -111,5 +112,38 @@ router.get("/", getCompanyDocuments);
  *         description: Failed to download document or fetch from storage
  */
 router.get("/:documentId/download", downloadDocument);
+
+/**
+ * @swagger
+ * /api/documents/{documentId}:
+ *   delete:
+ *     summary: Delete a specific document
+ *     tags: [Documents]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: documentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the document to delete.
+ *     responses:
+ *       200:
+ *         description: Document deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Document deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Document not found or access denied
+ */
+router.delete("/:documentId", deleteDocument);
 
 export default router;
