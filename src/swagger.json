@@ -751,6 +751,99 @@
         }
       }
     },
+    "/api/documents/{documentId}/download": {
+      "get": {
+        "summary": "Download a specific document",
+        "tags": ["Documents"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "documentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the document to download."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Document file stream.",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid document ID format"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Document not found or access denied"
+          },
+          "500": {
+            "description": "Failed to download document or fetch from storage"
+          }
+        }
+      }
+    },
+    "/api/documents/{documentId}": {
+      "delete": {
+        "summary": "Delete a specific document",
+        "tags": ["Documents"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "documentId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the document to delete."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Document deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Document deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Document not found or access denied"
+          }
+        }
+      }
+    },
     "/api/notifications/my": {
       "get": {
         "summary": "Retrieve notifications for the authenticated user",

@@ -7,7 +7,7 @@ import { AuthenticatedRequest } from "../../../middlewares/auth.middleware";
 // Import the InvitationModel (assuming it's created as described above)
 import { InvitationModel } from "../../invitation/invitation.model";
 
-const ACCESS_TOKEN_EXPIRES_IN = "15m"; // Short-lived access token
+const ACCESS_TOKEN_EXPIRES_IN = "30m"; // Short-lived access token
 const REFRESH_TOKEN_EXPIRES_IN_MS = 7 * 24 * 60 * 60 * 1000;
 const REFRESH_TOKEN_EXPIRES_IN_JWT = "7d";
 
