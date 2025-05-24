@@ -1,5 +1,10 @@
 import express from "express";
-import { createEvent, getEvents } from "./calendar.controller";
+import {
+  createEvent,
+  getEvents,
+  updateEvent,
+  deleteEvent,
+} from "./calendar.controller";
 import { authenticate } from "../../middlewares/auth.middleware";
 
 const router = express.Router();
@@ -75,7 +80,87 @@ router.use(authenticate);
  *       401:
  *         description: Unauthorized
  */
+
+/**
+ * @swagger
+ * /calendar/{eventId}:
+ *   put:
+ *     summary: Update an existing calendar event
+ *     tags: [Calendar]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the event to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               startTime:
+ *                 type: string
+ *                 format: date-time
+ *               endTime:
+ *                 type: string
+ *                 format: date-time
+ *               attendees:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Event updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CalendarEvent'
+ *       400:
+ *         description: Invalid input or invalid event ID
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden (user is not creator or admin)
+ *       404:
+ *         description: Event not found
+ *
+ *   delete:
+ *     summary: Delete a calendar event
+ *     tags: [Calendar]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the event to delete
+ *     responses:
+ *       200:
+ *         description: Event deleted successfully
+ *       400:
+ *         description: Invalid event ID
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden (user is not creator or admin)
+ *       404:
+ *         description: Event not found
+ */
+
 router.post("/", createEvent);
 router.get("/", getEvents);
+router.put("/:eventId", updateEvent);
+router.delete("/:eventId", deleteEvent);
 
 export default router;
