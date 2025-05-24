@@ -4,10 +4,11 @@ import {
   getTeamTasks,
   updateTaskStatus,
   addComment,
+  uploadAttachment,
+  updateTask,
 } from "./task.controller";
 import { authenticate } from "../../middlewares/auth.middleware";
 import { upload } from "../../utils/multer";
-import { uploadAttachment } from "./task.controller";
 
 const router = express.Router();
 router.use(authenticate);
@@ -135,6 +136,8 @@ router.get("/:teamId", getTeamTasks);
  *         description: Task not found
  */
 router.patch("/:taskId/status", updateTaskStatus);
+
+router.patch("/:taskId", updateTask);
 
 /**
  * @swagger

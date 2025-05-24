@@ -91,8 +91,31 @@ export const getTeamTasks = async (
   res.status(200).json(tasks);
 };
 
+export const updateTask = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  const { taskId } = req.params;
+  const updates = req.body;
+  try {
+    const updatedTask = await TaskModel.findByIdAndUpdate(taskId, updates, {
+      new: true,
+    });
+
+    if (!updatedTask) {
+      res.status(404).json({ message: "Task not found" });
+      return;
+    }
+    res.status(200).json(updatedTask);
+  } catch (error) {
+    console.error(`Error updating task ${taskId}:`, error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while updating the task." });
+  }
+};
 export const updateTaskStatus = async (
-  req: AuthenticatedRequest, // Changed to AuthenticatedRequest
+  req: AuthenticatedRequest,
   res: Response
 ): Promise<void> => {
   const { taskId } = req.params;
@@ -126,7 +149,8 @@ export const updateTaskStatus = async (
   // Correctly handle assignedTo as an array
   if (task.assignedTo && Array.isArray(task.assignedTo)) {
     for (const assignee of task.assignedTo) {
-      if (assignee) { // Ensure assignee is not null/undefined
+      if (assignee) {
+        // Ensure assignee is not null/undefined
         const assigneeIdStr =
           typeof assignee === "object" && (assignee as PopulatedUser)._id
             ? (assignee as PopulatedUser)._id.toString()
