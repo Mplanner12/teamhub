@@ -45,20 +45,22 @@ export const getAllCompanies = async (
   req: AuthenticatedRequest,
   res: Response
 ): Promise<void> => {
-  // Ensure req.user and req.user.email are available from the authentication middleware
-  if (!req.user || !req.user.email) {
+  if (!req.user || !req.user._id) {
     res
       .status(400)
-      .json({ message: "User email not found in authentication token." });
+      .json({ message: "User not found in authentication token." });
     return;
   }
 
-  const userEmail = req.user.email;
+  const userId = req.user._id;
 
-  // Find companies where the contactEmail matches the authenticated user's email
   const companies = await CompanyModel.find({
-    contactEmail: userEmail,
-  }).populate("createdBy", "fullName email");
+    $or: [{ createdBy: userId }, { owner: userId }, { "members.user": userId }],
+  })
+    .populate("createdBy", "fullName email")
+    .populate("owner", "fullName email")
+    .populate("members.user", "fullName email role");
+
   res.status(200).json(companies);
 };
 

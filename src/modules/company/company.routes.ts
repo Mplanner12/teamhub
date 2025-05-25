@@ -101,7 +101,7 @@ router.use(authenticate);
  *         description: Forbidden
  */
 router.post("/", roleGuard(["superAdmin"]), createCompany);
-router.get("/", roleGuard(["superAdmin"]), getAllCompanies);
+router.get("/", roleGuard(["superAdmin", "admin", "member"]), getAllCompanies);
 
 /**
  * @swagger

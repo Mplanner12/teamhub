@@ -6,6 +6,7 @@ import { sendEmail } from "../../../utils/sendEmail";
 import { AuthenticatedRequest } from "../../../middlewares/auth.middleware";
 // Import the InvitationModel (assuming it's created as described above)
 import { InvitationModel } from "../../invitation/invitation.model";
+import { CompanyModel } from "../../company/company.model";
 
 const ACCESS_TOKEN_EXPIRES_IN = "15m"; // Short-lived access token
 const REFRESH_TOKEN_EXPIRES_IN_MS = 7 * 24 * 60 * 60 * 1000;
@@ -446,6 +447,13 @@ export const acceptInvitationController = async (
       companyId: invitation.companyId,
       isVerified: true,
     });
+
+    await CompanyModel.findByIdAndUpdate(invitation.companyId, {
+      $addToSet: {
+        members: { user: newUser._id, role: invitation.role || "member" },
+      },
+    });
+    // -------------------------------------------------------
 
     invitation.status = "accepted";
     await invitation.save();
