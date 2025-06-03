@@ -154,7 +154,7 @@ router.get(
 router.put(
   "/add-member",
   authenticate,
-  roleGuard(["admin"]),
+  roleGuard(["admin", "superAdmin"]),
   teamController.addMember
 );
 
@@ -240,7 +240,7 @@ router.put(
 router.put(
   "/update-lead",
   authenticate,
-  roleGuard(["admin"]),
+  roleGuard(["admin", "superAdmin"]),
   teamController.updateLead
 );
 
