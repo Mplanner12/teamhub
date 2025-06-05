@@ -9,6 +9,7 @@ import teamRoutes from "../modules/team/team.routes";
 import notificationRoutes from "../modules/notifications/notification.routes";
 import authRoutes from "../modules/auth/auth.routes";
 import callRuotes from "../modules/call/call.routes";
+import feedRoutes from "../modules/feed/feed.routes";
 
 const router = express.Router();
 
@@ -23,5 +24,6 @@ router.use("/api/documents", documentRoutes);
 router.use("/calendar", require("../modules/calendar/calendar.routes").default);
 router.use("/api/notifications", notificationRoutes);
 router.use("/api/calls", callRuotes);
+router.use("/api/feeds", feedRoutes);
 
 export default router;
